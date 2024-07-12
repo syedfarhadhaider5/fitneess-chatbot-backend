@@ -13,6 +13,16 @@
 |
 */
 
+$router->options(
+    '/{any:.*}',
+    [
+        'middleware' => ['cors'],
+        function () {
+            return response(['status' => 'success'], 200);
+        }
+    ]
+);
+
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('messages', 'MessageController@index');
     $router->post('messages', 'MessageController@store');
