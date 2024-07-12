@@ -13,6 +13,11 @@
 |
 */
 
-$router->get('/', function () use ($router) {
-    return $router->app->version();
+$router->group(['prefix' => 'api'], function () use ($router) {
+    $router->get('messages', 'MessageController@index');
+    $router->post('messages', 'MessageController@store');
+    $router->get('messages/{id}', 'MessageController@show');
+    $router->put('messages/{id}', 'MessageController@update');
+    $router->delete('messages/{id}', 'MessageController@destroy');
 });
+
