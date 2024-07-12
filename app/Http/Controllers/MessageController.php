@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Message;
 use Illuminate\Http\Request;
-
+use OpenAI;
 class MessageController extends Controller
 {
     // Retrieve all messages
@@ -18,14 +18,34 @@ class MessageController extends Controller
     {
         $this->validate($request, [
             'question' => 'required|string',
-            'answer' => 'required|string',
             'time' => 'required|date_format:H:i:s',
             'date' => 'required|date',
             'flag' => 'required|in:seen,unseen'
         ]);
+        $apiKey = env('OPEN_API_KEY');
 
-        $message = Message::create($request->all());
+        // Prompt provided by the user
 
+        $prompt = 'I am interested in becoming a fitness trainer. Can you provide advice on how to get certified and start a career in fitness training?';
+        $question = $request->question;
+        // Make API call to OpenAI
+        $client = OpenAI::client($apiKey);
+        $result = $client->chat()->create([
+            'model' => 'gpt-4', // Use GPT-4 model
+            'messages' => [
+                ['role' => 'system', 'content' => $prompt],
+                ['role' => 'user', 'content' => $question],
+            ],
+        ]);
+        // Extract the response
+        $answer = $result->choices[0]->message->content;
+        $message = new Message();
+        $message->question = $request->question;
+        $message->answer  = $answer ;
+        $message->time = $request->time;
+        $message->date = $request->date;
+        $message->flag = $request->flag;
+        $message->save();
         return response()->json($message, 201);
     }
 
