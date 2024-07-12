@@ -26,7 +26,7 @@ class MessageController extends Controller
 
         // Prompt provided by the user
 
-        $prompt = 'I am interested in becoming a fitness trainer. Can you provide advice on how to get certified and start a career in fitness training?';
+        $prompt = 'Behave like a professional fitness trainer, I want to save the response in div, li, h3 and h3 color #f9c604.';
         $question = $request->question;
         // Make API call to OpenAI
         $client = OpenAI::client($apiKey);
