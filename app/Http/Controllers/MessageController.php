@@ -19,7 +19,7 @@ class MessageController extends Controller
         $this->validate($request, [
             'question' => 'required|string',
             'answer' => 'required|string',
-            'time' => 'required|date_format:H:i',
+            'time' => 'required|date_format:H:i:s',
             'date' => 'required|date',
             'flag' => 'required|in:seen,unseen'
         ]);
@@ -41,7 +41,7 @@ class MessageController extends Controller
         $this->validate($request, [
             'question' => 'sometimes|required|string',
             'answer' => 'sometimes|required|string',
-            'time' => 'sometimes|required|date_format:H:i',
+            'time' => 'sometimes|required|date_format:H:i:s',
             'date' => 'sometimes|required|date',
             'flag' => 'sometimes|required|in:seen,unseen'
         ]);
