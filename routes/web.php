@@ -29,5 +29,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('messages/{id}', 'MessageController@show');
     $router->put('messages/{id}', 'MessageController@update');
     $router->delete('messages/{id}', 'MessageController@destroy');
+    $router->post('/translate-and-update', 'MessageController@translateAndUpdate');
 });
 

@@ -25,7 +25,6 @@ class MessageController extends Controller
         $apiKey = env('OPEN_API_KEY');
 
         // Prompt provided by the user
-
         $prompt = 'Behave like a professional fitness trainer, I want to save the response in div, li, h3 and h3 color #f9c604.';
         $question = $request->question;
         // Make API call to OpenAI
@@ -78,5 +77,51 @@ class MessageController extends Controller
         Message::findOrFail($id)->delete();
 
         return response()->json(null, 204);
+    }
+    public function translateAndUpdate(Request $request)
+    {
+        $apiKey = env('OPEN_API_KEY');
+        $client = OpenAI::client($apiKey);
+
+        $language = $request->input('language'); // Language input from frontend
+
+        try {
+            // Fetch all messages (questions and answers) from the database
+            $messages = Message::all();
+
+            foreach ($messages as $message) {
+                $question = $message->question;
+                $answer = $message->answer;
+
+                // Translate question
+                $resultQuestion = $client->chat()->create([
+                    'model' => 'gpt-4', // Use the appropriate model for translation
+                    'messages' => [
+                        ['role' => 'system', 'content' => "Translate to {$language}: {$question}"],
+                    ],
+                ]);
+
+                // Translate answer
+                $resultAnswer = $client->chat()->create([
+                    'model' => 'gpt-4', // Use the appropriate model for translation
+                    'messages' => [
+                        ['role' => 'system', 'content' => "Translate to {$language}: {$answer}"],
+                    ],
+                ]);
+
+                // Assuming $resultQuestion['choices'][0]['text'] and $resultAnswer['choices'][0]['text'] contain the translated texts
+                $translatedQuestion = $resultQuestion->choices[0]->message->content;
+                $translatedAnswer = $resultAnswer->choices[0]->message->content;
+
+                // Update the message record with translated content
+                $message->question = $translatedQuestion; // Update question with translated content
+                $message->answer = $translatedAnswer; // Update answer with translated content
+                $message->save();
+            }
+
+            return response()->json(['success' => true, 'message' => 'Translation and update successful']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
     }
 }
